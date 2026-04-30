@@ -2,6 +2,8 @@
 
 `hue-dmx-IBL` documents an image-based lighting workflow where Unreal Engine drives Philips Hue fixtures through DMX over Art-Net.
 
+![hue-dmx-IBL Overview](images/overview-workflow.png)
+
 The key design decision is to keep Unreal Engine responsible for lighting content and DMX output, while the Python bridge handles protocol translation from Art-Net packets to Hue Entertainment streaming calls.
 
 The Hue Bridge is not a DMX receiver. It receives Hue Entertainment API stream data from the Python bridge, then controls the Hue lights.

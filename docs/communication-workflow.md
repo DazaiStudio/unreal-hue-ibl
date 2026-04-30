@@ -4,6 +4,10 @@ This project connects Unreal Engine DMX output to Philips Hue Entertainment stre
 
 Important distinction: the Hue Bridge does **not** receive DMX or Art-Net directly. DMX/Art-Net exists only between Unreal Engine and the Python bridge. The Python bridge then sends Hue Entertainment API messages to the Hue Bridge.
 
+![Communication Workflow](images/communication-workflow.png)
+
+The generated image is intended for quick reading. The Mermaid diagram below is the editable source-of-truth version.
+
 ```mermaid
 flowchart LR
   subgraph LOCAL[Local Computer]
@@ -45,7 +49,7 @@ Use `127.0.0.1` as the Unreal Art-Net destination when Unreal Engine and the Pyt
 
 ## Public Overview Image
 
-The rendered overview image lives at:
+The rendered communication workflow image lives at:
 
 ```text
 docs/images/communication-workflow.png

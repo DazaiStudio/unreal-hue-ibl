@@ -2,6 +2,10 @@
 
 This view shows the physical devices involved in the setup.
 
+![Hardware / Network Workflow](images/hardware-network-workflow.png)
+
+The generated image is intended for quick reading. The Mermaid diagram below is the editable source-of-truth version.
+
 ```mermaid
 flowchart LR
   LAPTOP[Laptop<br/>Unreal Engine + Python Bridge]
