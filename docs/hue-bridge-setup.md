@@ -2,6 +2,8 @@
 
 The bridge uses the Philips Hue Entertainment Streaming API, not regular scene updates.
 
+The Hue Bridge does not receive DMX or Art-Net directly. The Python bridge translates Unreal Engine Art-Net output into Hue Entertainment stream data before sending anything to the Hue Bridge.
+
 Required Hue-side setup:
 
 1. A Philips Hue Bridge on the same local network.

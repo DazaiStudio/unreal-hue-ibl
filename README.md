@@ -7,15 +7,25 @@
 ## Communication Workflow
 
 ```text
-Unreal Engine DMX / Art-Net Output
--> Art-Net UDP 127.0.0.1:6454
--> Python Hue Art-Net Bridge
--> Philips Hue Entertainment Streaming API
--> Hue Bridge
--> Philips Hue Lights
+Laptop
+  Unreal Engine -> Art-Net UDP 127.0.0.1:6454 -> Python Bridge
+  Python Bridge -> Hue Entertainment API over LAN
+
+Network
+  Router -> Hue Bridge -> Philips Hue Lights
 ```
 
+The Hue Bridge does **not** receive DMX or Art-Net directly. The Python bridge receives Art-Net from Unreal Engine, translates DMX values into Hue Entertainment RGB updates, and sends those updates to the Hue Bridge over the local network.
+
 The repository is intentionally focused on the workflow and reproducible bridge setup. The full Unreal Engine project/template can be distributed separately as a release or external download link instead of committing the entire UE project into Git.
+
+## Workflow Views
+
+| View | Purpose |
+| --- | --- |
+| [Hardware Workflow](docs/hardware-workflow.md) | Shows the physical laptop, router, Hue Bridge, and Hue lights connection |
+| [Communication Workflow](docs/communication-workflow.md) | Shows which protocols are used between each part |
+| [System Architecture](docs/system-architecture.md) | Explains what each component actually does |
 
 ## Repository Layout
 
@@ -28,7 +38,9 @@ bridge/
 docs/
   communication-workflow.md  Mermaid workflow and signal path notes
   dmx-mapping.md             DMX channel layout
+  hardware-workflow.md       Physical connection diagram
   hue-bridge-setup.md        Hue Entertainment setup notes
+  system-architecture.md     Component responsibilities
   troubleshooting.md
   unreal-setup.md
   images/
