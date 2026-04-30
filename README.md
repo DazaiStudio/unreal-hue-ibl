@@ -1,8 +1,8 @@
-# hue-dmx-IBL
+# unreal-hue-ibl
 
-`hue-dmx-IBL` is an architecture reference and bridge template for driving Philips Hue lights from Unreal Engine using DMX over Art-Net.
+`unreal-hue-ibl` is an architecture reference and bridge template for driving Philips Hue lights from Unreal Engine using DMX over Art-Net.
 
-![hue-dmx-IBL Overview](docs/images/overview-workflow.png)
+![unreal-hue-ibl Overview](docs/images/overview-workflow.png)
 
 ## Communication Workflow
 

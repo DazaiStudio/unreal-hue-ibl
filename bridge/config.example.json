@@ -5,7 +5,7 @@
     "ip_address": "192.168.1.100",
     "swversion": 1962097030,
     "username": "your-hue-api-username",
-    "hue_app_id": "hue-dmx-ibl",
+    "hue_app_id": "unreal-hue-ibl",
     "clientkey": "your-hue-entertainment-clientkey",
     "name": "My Hue Bridge"
   },

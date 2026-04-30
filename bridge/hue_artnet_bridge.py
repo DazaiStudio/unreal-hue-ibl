@@ -58,7 +58,7 @@ def create_streaming_session(hue_config):
         ip_address=hue_config["ip_address"],
         swversion=hue_config["swversion"],
         username=hue_config["username"],
-        hue_app_id=hue_config.get("hue_app_id", "hue-dmx-ibl"),
+        hue_app_id=hue_config.get("hue_app_id", "unreal-hue-ibl"),
         clientkey=hue_config["clientkey"],
         name=hue_config.get("name", "Hue Bridge"),
     )
