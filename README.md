@@ -39,7 +39,7 @@ This repository is intentionally not a full Unreal Engine project backup. Large 
 
 1. Configure a Hue Entertainment Area in the Philips Hue app.
 2. Copy `bridge/config.example.json` to `bridge/config.json`.
-3. Fill in your Hue Bridge values in `bridge/config.json`.
+3. Fill in your Hue Bridge values in `bridge/config.json`. See [Hue Bridge Setup](docs/hue-bridge-setup.md) for how to generate `username`, `clientkey`, and `rid`.
 4. Install dependencies:
 
 ```bash

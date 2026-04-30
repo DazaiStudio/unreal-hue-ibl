@@ -20,7 +20,19 @@ clientkey
 
 Copy `bridge/config.example.json` to `bridge/config.json`, then fill in the local values. Keep `bridge/config.json` private.
 
-Use the Hue Bridge's local network IP for `hue.ip_address`, for example:
+## Get Hue Credentials
+
+The Hue credentials are generated locally from the Hue Bridge. Do not paste the real values into public docs or commits.
+
+### 1. Find The Bridge IP
+
+Use one of these methods:
+
+- Open the Hue app, go to the Hue Bridge settings, and read the bridge IP address.
+- Visit `https://discovery.meethue.com` from a browser on the same network.
+- Check the router DHCP client table.
+
+Put this value in:
 
 ```json
 {
@@ -30,7 +42,83 @@ Use the Hue Bridge's local network IP for `hue.ip_address`, for example:
 }
 ```
 
-Treat that value as local setup information. It can be shown as an example, but the real address should live in `bridge/config.json`.
+### 2. Generate `username` And `clientkey`
+
+Press the physical button on the Hue Bridge, then run this within about 30 seconds:
+
+```powershell
+curl.exe -k -X POST "https://<bridge-ip>/api" `
+  -H "Content-Type: application/json" `
+  -d '{"devicetype":"unreal-hue-ibl#laptop","generateclientkey":true}'
+```
+
+The response should include:
+
+```json
+[
+  {
+    "success": {
+      "username": "generated-username",
+      "clientkey": "generated-clientkey"
+    }
+  }
+]
+```
+
+Copy those values into `bridge/config.json`.
+
+### 3. Get `identification` And `swversion`
+
+Use the generated username:
+
+```powershell
+curl.exe -k "https://<bridge-ip>/api/<username>/config"
+```
+
+Use the response fields:
+
+```text
+bridgeid  -> hue.identification
+swversion -> hue.swversion
+name      -> hue.name
+```
+
+### 4. Get The Entertainment Area `rid`
+
+Create an Entertainment Area in the Hue app first, then query the bridge:
+
+```powershell
+curl.exe -k "https://<bridge-ip>/clip/v2/resource/entertainment_configuration" `
+  -H "hue-application-key: <username>"
+```
+
+Use the selected Entertainment Area's top-level `id` as:
+
+```text
+hue.rid
+```
+
+Example shape:
+
+```json
+{
+  "data": [
+    {
+      "id": "00000000-0000-0000-0000-000000000000",
+      "type": "entertainment_configuration",
+      "metadata": {
+        "name": "My Entertainment Area"
+      }
+    }
+  ]
+}
+```
+
+## References
+
+- Philips Hue Developer Program: [Get Started](https://developers.meethue.com/develop/get-started-2/)
+- Philips Hue discovery endpoint: [https://discovery.meethue.com](https://discovery.meethue.com)
+- Hue Entertainment credential notes: [Philips Hue Entertainment API walkthrough](https://iotech.blog/posts/philips-hue-entertainment-api/)
 
 ## Standard Hue Bridge vs Hue Bridge Pro
 
