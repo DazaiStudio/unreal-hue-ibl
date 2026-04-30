@@ -6,25 +6,6 @@ Important distinction: the Hue Bridge does **not** receive DMX or Art-Net direct
 
 ![Communication Workflow](images/communication-workflow.png)
 
-The generated image is intended for quick reading. The Mermaid diagram below is the editable source-of-truth version.
-
-```mermaid
-flowchart LR
-  subgraph LOCAL[Local Computer]
-    UE[Unreal Engine<br/>DMX / Art-Net Output]
-    PY[Python Bridge<br/>Parse ArtDMX<br/>Map Dimmer + RGB]
-  end
-
-  API[Hue Entertainment API<br/>Streaming RGB]
-  BRIDGE[Hue Bridge]
-  LIGHTS[Philips Hue Lights]
-
-  UE -->|Art-Net UDP<br/>127.0.0.1:6454<br/>Universe 1| PY
-  PY -->|LAN / HTTPS + DTLS| API
-  API --> BRIDGE
-  BRIDGE -->|Hue light control| LIGHTS
-```
-
 ## Data Path
 
 1. Unreal Engine and the Python bridge run on the same local computer.
@@ -40,6 +21,8 @@ flowchart LR
 ## Why `127.0.0.1`
 
 Use `127.0.0.1` as the Unreal Art-Net destination when Unreal Engine and the Python bridge are running on the same computer. Use the receiver machine's LAN IP only when Unreal and the Python bridge run on different machines.
+
+The Hue Bridge IP is configured separately in `bridge/config.json` as `hue.ip_address`. Do not hardcode a personal bridge IP in public docs.
 
 ## Related Workflow Views
 

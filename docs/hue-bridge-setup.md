@@ -20,6 +20,18 @@ clientkey
 
 Copy `bridge/config.example.json` to `bridge/config.json`, then fill in the local values. Keep `bridge/config.json` private.
 
+Use the Hue Bridge's local network IP for `hue.ip_address`, for example:
+
+```json
+{
+  "hue": {
+    "ip_address": "192.168.1.100"
+  }
+}
+```
+
+Treat that value as local setup information. It can be shown as an example, but the real address should live in `bridge/config.json`.
+
 ## Standard Hue Bridge vs Hue Bridge Pro
 
 The communication path remains the same:

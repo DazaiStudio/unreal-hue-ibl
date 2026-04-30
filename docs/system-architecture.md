@@ -2,28 +2,6 @@
 
 This view explains what each part of the system actually does.
 
-```mermaid
-flowchart TB
-  subgraph LAPTOP[Laptop / Local Computer]
-    UE[Unreal Engine<br/>Creates lighting content<br/>Outputs DMX over Art-Net]
-    PY[Python Bridge<br/>Receives ArtDMX<br/>Maps DMX channels to RGB<br/>Streams Hue updates]
-    UE -->|Art-Net UDP<br/>127.0.0.1:6454| PY
-  end
-
-  subgraph LAN[Local Network]
-    ROUTER[Router / LAN]
-  end
-
-  subgraph HUE[Hue System]
-    BRIDGE[Hue Bridge<br/>Receives Hue Entertainment stream<br/>Controls lights]
-    LIGHTS[Hue Lights<br/>Display RGB output]
-    BRIDGE --> LIGHTS
-  end
-
-  PY -->|Hue Entertainment API| ROUTER
-  ROUTER --> BRIDGE
-```
-
 ## Responsibilities
 
 | Component | Responsibility | Does not do |

@@ -63,6 +63,8 @@ Fixture layout: Dimmer, Red, Green, Blue
 
 Use `127.0.0.1` when Unreal Engine and the Python bridge are running on the same laptop.
 
+Set the Hue Bridge's local network IP in `bridge/config.json` as `hue.ip_address`. Use an example such as `192.168.1.100` in docs, not your personal bridge IP.
+
 ## Docs
 
 | Document | Purpose |
