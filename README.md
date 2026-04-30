@@ -1,74 +1,46 @@
 # unreal-hue-ibl
 
-`unreal-hue-ibl` is an architecture reference and bridge template for driving Philips Hue lights from Unreal Engine using DMX over Art-Net.
+`unreal-hue-ibl` is an Unreal Engine to Philips Hue lighting bridge reference. It shows how Unreal Engine DMX output can drive Hue lights through a small Python translator.
 
 ![unreal-hue-ibl Overview](docs/images/overview-workflow.png)
 
-## Communication Workflow
+## Architecture At A Glance
 
 ```text
 Laptop
-  Unreal Engine -> Art-Net UDP 127.0.0.1:6454 -> Python Bridge
-  Python Bridge -> Hue Entertainment API over LAN
+  Unreal Engine --Art-Net UDP 127.0.0.1:6454--> Python Bridge
 
-Network
-  Router -> Hue Bridge -> Philips Hue Lights
+Network / Hue System
+  Python Bridge --Hue Entertainment Stream--> Router / LAN --> Hue Bridge --> Hue Lights
 ```
 
-The Hue Bridge does **not** receive DMX or Art-Net directly. The Python bridge receives Art-Net from Unreal Engine, translates DMX values into Hue Entertainment RGB updates, and sends those updates to the Hue Bridge over the local network.
-
-The repository is intentionally focused on the workflow and reproducible bridge setup. The full Unreal Engine project/template can be distributed separately as a release or external download link instead of committing the entire UE project into Git.
-
-## Workflow Views
-
-| View | Purpose |
-| --- | --- |
-| [Hardware Workflow](docs/hardware-workflow.md) | Shows the physical laptop, router, Hue Bridge, and Hue lights connection |
-| [Communication Workflow](docs/communication-workflow.md) | Shows which protocols are used between each part |
-| [System Architecture](docs/system-architecture.md) | Explains what each component actually does |
-
-## Repository Layout
+The important boundary is the Python bridge:
 
 ```text
-bridge/
-  hue_artnet_bridge.py       Public bridge script without private credentials
-  config.example.json        Example Hue/Art-Net configuration
-  requirements.txt
-
-docs/
-  communication-workflow.md  Mermaid workflow and signal path notes
-  dmx-mapping.md             DMX channel layout
-  hardware-workflow.md       Physical connection diagram
-  hue-bridge-setup.md        Hue Entertainment setup notes
-  system-architecture.md     Component responsibilities
-  troubleshooting.md
-  unreal-setup.md
-  images/
-    overview-workflow.png
-    communication-workflow.png
-    hardware-network-workflow.png
-
-unreal-template/
-  README.md                  Template distribution notes and download link slot
+DMX / Art-Net side: Unreal Engine -> Python Bridge
+Hue side:          Python Bridge -> Hue Bridge -> Hue Lights
 ```
 
-## Default Signal Settings
+The Hue Bridge does **not** receive DMX or Art-Net directly. It receives Hue Entertainment stream data from the Python bridge.
 
-| Layer | Setting |
-| --- | --- |
-| Protocol | Art-Net |
-| UDP port | `6454` |
-| Unreal destination IP | `127.0.0.1` when bridge runs on the same machine |
-| Universe | `1` |
-| Fixture layout | `Dimmer, Red, Green, Blue` |
-| Default fixture count | `11` |
+Art-Net is the local protocol link from Unreal Engine to Python. It is not a separate hardware device or app in this setup.
 
-## Quick Start
+## How To Use This Repo
+
+1. Start with the overview above to understand the high-level hardware path.
+2. Read [Communication Workflow](docs/communication-workflow.md) to understand the exact protocol path.
+3. Read [Hardware Workflow](docs/hardware-workflow.md) to understand the laptop, router, Hue Bridge, and Hue lights setup.
+4. Use the public Python bridge in [bridge/](bridge/) as the runnable Art-Net to Hue translator.
+5. Use [unreal-template/](unreal-template/) as the placeholder for the downloadable Unreal Engine template project.
+
+This repository is intentionally not a full Unreal Engine project backup. Large UE assets should be distributed through a GitHub Release or external template download link.
+
+## Run The Bridge
 
 1. Configure a Hue Entertainment Area in the Philips Hue app.
 2. Copy `bridge/config.example.json` to `bridge/config.json`.
-3. Fill in your Hue Bridge `ip_address`, `identification`, `rid`, `username`, and `clientkey`.
-4. Install Python dependencies:
+3. Fill in your Hue Bridge values in `bridge/config.json`.
+4. Install dependencies:
 
 ```bash
 pip install -r bridge/requirements.txt
@@ -80,8 +52,39 @@ pip install -r bridge/requirements.txt
 python bridge/hue_artnet_bridge.py --config bridge/config.json
 ```
 
-6. In Unreal Engine, output Art-Net to `127.0.0.1`, UDP port `6454`, universe `1`.
+6. In Unreal Engine, send Art-Net to:
 
-## Security Note
+```text
+Destination IP: 127.0.0.1
+Port: 6454
+Universe: 1
+Fixture layout: Dimmer, Red, Green, Blue
+```
 
-Do not commit your real Hue Bridge `username`, `clientkey`, local bridge config, or private network details. Use `config.example.json` for public documentation and keep `config.json` local.
+Use `127.0.0.1` when Unreal Engine and the Python bridge are running on the same laptop.
+
+## Docs
+
+| Document | Purpose |
+| --- | --- |
+| [Overview](docs/overview.md) | Project concept and component responsibilities |
+| [Communication Workflow](docs/communication-workflow.md) | Protocol flow from Unreal Engine to Hue lights |
+| [Hardware Workflow](docs/hardware-workflow.md) | Physical laptop, router, bridge, and light setup |
+| [System Architecture](docs/system-architecture.md) | What each component does and does not do |
+| [Unreal Setup](docs/unreal-setup.md) | Unreal Engine DMX / Art-Net setup notes |
+| [Hue Bridge Setup](docs/hue-bridge-setup.md) | Hue Entertainment setup notes |
+| [DMX Mapping](docs/dmx-mapping.md) | DMX channel mapping |
+| [Troubleshooting](docs/troubleshooting.md) | Common setup issues |
+
+## Repository Layout
+
+```text
+bridge/             Python Art-Net to Hue bridge
+docs/               Architecture, workflow, and setup documentation
+docs/images/        Generated workflow diagrams
+unreal-template/    Unreal Engine template distribution notes
+```
+
+## Security
+
+Do not commit your real Hue Bridge `username`, `clientkey`, `bridge/config.json`, or private network details. Keep local credentials out of Git.

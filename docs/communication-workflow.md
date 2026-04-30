@@ -12,7 +12,6 @@ The generated image is intended for quick reading. The Mermaid diagram below is 
 flowchart LR
   subgraph LOCAL[Local Computer]
     UE[Unreal Engine<br/>DMX / Art-Net Output]
-    ARTNET[Art-Net UDP<br/>127.0.0.1:6454<br/>Universe 1]
     PY[Python Bridge<br/>Parse ArtDMX<br/>Map Dimmer + RGB]
   end
 
@@ -20,8 +19,7 @@ flowchart LR
   BRIDGE[Hue Bridge]
   LIGHTS[Philips Hue Lights]
 
-  UE --> ARTNET
-  ARTNET -->|internal Art-Net bridge| PY
+  UE -->|Art-Net UDP<br/>127.0.0.1:6454<br/>Universe 1| PY
   PY -->|LAN / HTTPS + DTLS| API
   API --> BRIDGE
   BRIDGE -->|Hue light control| LIGHTS
@@ -30,13 +28,14 @@ flowchart LR
 ## Data Path
 
 1. Unreal Engine and the Python bridge run on the same local computer.
-2. Unreal Engine sends DMX frames using Art-Net to `127.0.0.1:6454`.
-3. The Python bridge listens for ArtDMX UDP packets on port `6454`.
-4. The bridge filters packets by universe.
-5. DMX channels are mapped into Hue RGB values.
-6. RGB updates are sent through the Hue Entertainment Streaming API over the LAN.
-7. The Hue Bridge receives Hue Entertainment stream data, not DMX.
-8. The Hue Bridge forwards the real-time lighting state to Hue lights.
+2. Unreal Engine sends DMX frames using its Art-Net output to `127.0.0.1:6454`.
+3. Art-Net is the protocol on the local UDP link between Unreal Engine and Python, not a separate hardware device or app.
+4. The Python bridge listens for ArtDMX UDP packets on port `6454`.
+5. The bridge filters packets by universe.
+6. DMX channels are mapped into Hue RGB values.
+7. RGB updates are sent through the Hue Entertainment Streaming API over the LAN.
+8. The Hue Bridge receives Hue Entertainment stream data, not DMX.
+9. The Hue Bridge forwards the real-time lighting state to Hue lights.
 
 ## Why `127.0.0.1`
 
