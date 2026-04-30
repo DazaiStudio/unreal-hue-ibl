@@ -1,0 +1,39 @@
+# Unreal Engine local/generated data
+/Binaries/
+/Build/
+/DerivedDataCache/
+/Intermediate/
+/Saved/
+/.vs/
+*.sln
+*.VC.db
+*.opensdf
+*.suo
+
+# Local Unreal template source kept outside this documentation repo
+/Config/
+/Content/
+/Hue_ImageBaed.uproject
+
+# Local/private bridge experiments
+/Python/
+/Hue_ArtNet_Bridge_Notes.md
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Secrets and local config
+.env
+*.local.json
+config.json
+bridge/config.json
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
