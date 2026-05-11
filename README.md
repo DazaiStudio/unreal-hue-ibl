@@ -45,7 +45,9 @@ On Windows, open the `bridge/` folder and double-click:
 run_hue_artnet_bridge.bat
 ```
 
-The launcher will create a local Python virtual environment, install Python dependencies, create `bridge/config.json` when needed, and prompt for Hue Bridge settings the first time it runs.
+The launcher will look for Python 3 first. If Python is not installed, it will try to install Python automatically with Windows Package Manager (`winget`). Then it creates a local Python virtual environment, installs Python dependencies, creates `bridge/config.json` when needed, and prompts for Hue Bridge settings the first time it runs.
+
+If the computer does not have `winget` or internet access, install Python 3 manually from <https://www.python.org/downloads/> and enable `Add python.exe to PATH` during installation.
 
 You still need your Hue Bridge values: `ip_address`, `username`, `clientkey`, and Entertainment Area `rid`. See [Hue Bridge Setup](docs/hue-bridge-setup.md) for how to find or generate them.
 

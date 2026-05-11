@@ -14,20 +14,18 @@ if not exist "setup_config.py" goto missing_files
 if not exist "requirements.txt" goto missing_files
 if not exist "config.example.json" goto missing_files
 
-set "PY_BOOTSTRAP="
-where py >nul 2>nul
-if %ERRORLEVEL% EQU 0 set "PY_BOOTSTRAP=py -3"
-
-if not defined PY_BOOTSTRAP (
-    where python >nul 2>nul
-    if %ERRORLEVEL% EQU 0 set "PY_BOOTSTRAP=python"
+call :find_python
+if not defined PY_BOOTSTRAP_EXE (
+    echo Python 3 was not found. Trying to install Python automatically with winget...
+    call :install_python
+    call :find_python
 )
 
-if not defined PY_BOOTSTRAP goto missing_python
+if not defined PY_BOOTSTRAP_EXE goto missing_python
 
 if not exist ".venv\Scripts\python.exe" (
     echo Creating local Python virtual environment...
-    %PY_BOOTSTRAP% -m venv .venv
+    "%PY_BOOTSTRAP_EXE%" %PY_BOOTSTRAP_ARGS% -m venv .venv
     if errorlevel 1 goto venv_failed
 )
 
@@ -84,3 +82,52 @@ exit /b 1
 echo Failed to create bridge\config.json.
 pause
 exit /b 1
+
+:find_python
+set "PY_BOOTSTRAP_EXE="
+set "PY_BOOTSTRAP_ARGS="
+
+where py >nul 2>nul
+if %ERRORLEVEL% EQU 0 (
+    set "PY_BOOTSTRAP_EXE=py"
+    set "PY_BOOTSTRAP_ARGS=-3"
+    exit /b 0
+)
+
+where python >nul 2>nul
+if %ERRORLEVEL% EQU 0 (
+    set "PY_BOOTSTRAP_EXE=python"
+    exit /b 0
+)
+
+if exist "%LocalAppData%\Programs\Python\Python313\python.exe" (
+    set "PY_BOOTSTRAP_EXE=%LocalAppData%\Programs\Python\Python313\python.exe"
+    exit /b 0
+)
+
+if exist "%LocalAppData%\Programs\Python\Python312\python.exe" (
+    set "PY_BOOTSTRAP_EXE=%LocalAppData%\Programs\Python\Python312\python.exe"
+    exit /b 0
+)
+
+if exist "%LocalAppData%\Programs\Python\Python311\python.exe" (
+    set "PY_BOOTSTRAP_EXE=%LocalAppData%\Programs\Python\Python311\python.exe"
+    exit /b 0
+)
+
+exit /b 1
+
+:install_python
+where winget >nul 2>nul
+if errorlevel 1 (
+    echo winget was not found, so Python cannot be installed automatically.
+    exit /b 1
+)
+
+echo Installing Python 3.12 for the current Windows user...
+winget install -e --id Python.Python.3.12 --scope user --accept-package-agreements --accept-source-agreements
+if not errorlevel 1 exit /b 0
+
+echo Python 3.12 install failed. Trying Python 3.13...
+winget install -e --id Python.Python.3.13 --scope user --accept-package-agreements --accept-source-agreements
+exit /b %ERRORLEVEL%
