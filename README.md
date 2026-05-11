@@ -51,6 +51,8 @@ If the computer does not have `winget` or internet access, install Python 3 manu
 
 You still need your Hue Bridge values: `ip_address`, `username`, `clientkey`, and Entertainment Area `rid`. See [Hue Bridge Setup](docs/hue-bridge-setup.md) for how to find or generate them.
 
+The Hue Bridge IP can change when you move to another router, restart network gear, or get a new DHCP lease. `192.168.1.100` is only an example. If the bridge cannot connect, find the current Hue Bridge IP again and update `bridge/config.json`.
+
 ### Manual Run
 
 1. Configure a Hue Entertainment Area in the Philips Hue app.
@@ -79,7 +81,7 @@ Fixture layout: Dimmer, Red, Green, Blue
 
 Use `127.0.0.1` when Unreal Engine and the Python bridge are running on the same laptop.
 
-Set the Hue Bridge's local network IP in `bridge/config.json` as `hue.ip_address`. Use an example such as `192.168.1.100` in docs, not your personal bridge IP.
+Set the Hue Bridge's local network IP in `bridge/config.json` as `hue.ip_address`. Use an example such as `192.168.1.100` in docs, not your personal bridge IP. For long-term setups, reserve a fixed DHCP address for the Hue Bridge in your router so this value does not keep changing.
 
 ## Docs
 

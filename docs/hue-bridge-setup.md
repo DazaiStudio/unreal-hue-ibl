@@ -26,6 +26,8 @@ The Hue credentials are generated locally from the Hue Bridge. Do not paste the 
 
 ### 1. Find The Bridge IP
 
+The Hue Bridge IP is assigned by the router. It can change after moving to a different router, restarting network hardware, or receiving a new DHCP lease. Do not assume `192.168.1.100` is always correct.
+
 Use one of these methods:
 
 - Open the Hue app, go to the Hue Bridge settings, and read the bridge IP address.
@@ -41,6 +43,15 @@ Put this value in:
   }
 }
 ```
+
+If the Python bridge times out while connecting to this IP, test from the same computer:
+
+```powershell
+ping <bridge-ip>
+Test-NetConnection <bridge-ip> -Port 443
+```
+
+For a stable installation, reserve the Hue Bridge's IP address in the router's DHCP settings.
 
 ### 2. Generate `username` And `clientkey`
 
