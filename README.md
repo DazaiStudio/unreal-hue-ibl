@@ -2,60 +2,160 @@
 
 `unreal-hue-ibl` is an Unreal Engine to Philips Hue lighting bridge reference. It shows how Unreal Engine DMX output can drive Hue lights through a small Python translator.
 
-![unreal-hue-ibl Overview](docs/images/overview-workflow.png)
+## Quick Start For New Users
 
-## Architecture At A Glance
+This is the shortest path from a fresh repo download to a running Hue bridge.
+
+### 1. Prepare The Hue System
+
+1. Connect the computer and Philips Hue Bridge to the same router / local network.
+2. Open the Philips Hue app.
+3. Create or confirm a Hue Entertainment Area.
+4. Keep the physical Hue Bridge nearby because one setup step requires pressing its button.
+
+### 2. Download This Repo And The UE Demo Project
+
+Download or clone this repository, then open the folder:
 
 ```text
-Laptop
-  Unreal Engine --Art-Net UDP 127.0.0.1:6454--> Python Bridge
-
-Network / Hue System
-  Python Bridge --Hue Entertainment Stream--> Router / LAN --> Hue Bridge --> Hue Lights
+unreal-hue-ibl/bridge/
 ```
 
-The important boundary is the Python bridge:
+The Unreal Engine demo project is distributed separately because Unreal assets are too large for this lightweight bridge repo:
 
 ```text
-DMX / Art-Net side: Unreal Engine -> Python Bridge
-Hue side:          Python Bridge -> Hue Bridge -> Hue Lights
+https://drive.google.com/drive/folders/1Sp-gb3ZxKqR5yZtDikvC2sumbx9yYsh3?usp=drive_link
 ```
 
-The Hue Bridge does **not** receive DMX or Art-Net directly. It receives Hue Entertainment stream data from the Python bridge.
-
-Art-Net is the local protocol link from Unreal Engine to Python. It is not a separate hardware device or app in this setup.
-
-## How To Use This Repo
-
-1. Start with the overview above to understand the high-level hardware path.
-2. Read [Communication Workflow](docs/communication-workflow.md) to understand the exact protocol path.
-3. Read [Hardware Workflow](docs/hardware-workflow.md) to understand the laptop, router, Hue Bridge, and Hue lights setup.
-4. Use the public Python bridge in [bridge/](bridge/) as the runnable Art-Net to Hue translator.
-5. Use [unreal-template/](unreal-template/) as the placeholder for the downloadable Unreal Engine template project.
-
-This repository is intentionally not a full Unreal Engine project backup. Large UE assets should be distributed through a GitHub Release or external template download link.
-
-## Run The Bridge
-
-### One-Click Windows Launcher
-
-On Windows, open the `bridge/` folder and double-click:
+On Windows, the file to run is:
 
 ```text
 run_hue_artnet_bridge.bat
 ```
 
-The launcher uses PowerShell to bootstrap the bridge. It looks for a real Python 3 install first and ignores the Windows Store `python.exe` placeholder. If Python is not installed, it tries to install Python automatically with Windows Package Manager (`winget`), then falls back to downloading the official Windows installer from python.org. Then it creates a local Python virtual environment, installs Python dependencies, creates `bridge/config.json` when needed, and prompts for Hue Bridge settings the first time it runs.
+### 3. Find The Hue Bridge IP
 
-If the computer does not have `winget` or internet access, install Python 3 manually from <https://www.python.org/downloads/> and enable `Add python.exe to PATH` during installation.
+The Hue Bridge IP is assigned by the router and can change. `192.168.1.100` is only an example.
 
-You still need your Hue Bridge values: `ip_address`, `username`, `clientkey`, and Entertainment Area `rid`. See [Hue Bridge Setup](docs/hue-bridge-setup.md) for how to find or generate them.
+Use one of these methods:
 
-The Hue Bridge IP can change when you move to another router, restart network gear, or get a new DHCP lease. `192.168.1.100` is only an example. If the bridge cannot connect, find the current Hue Bridge IP again and update `bridge/config.json`.
+```powershell
+Invoke-RestMethod https://discovery.meethue.com/
+```
 
-Hue API values are not requested from a public website or shared between users. Each user generates their own `username` and `clientkey` from their local Hue Bridge by pressing the physical bridge button and calling the local Hue API. The Entertainment Area `rid` also comes from that user's own Hue Bridge setup.
+Or check:
 
-### Manual Run
+```text
+Hue app -> Bridge settings
+Router admin page -> Connected devices / DHCP clients
+```
+
+The value you need looks like:
+
+```text
+192.168.1.xxx
+```
+
+### 4. Generate `username` And `clientkey`
+
+Press the physical Hue Bridge button, then run this within about 30 seconds from a computer on the same network:
+
+```powershell
+curl.exe -k -X POST "https://<bridge-ip>/api" `
+  -H "Content-Type: application/json" `
+  -d '{"devicetype":"unreal-hue-ibl#laptop","generateclientkey":true}'
+```
+
+The response gives you:
+
+```text
+username
+clientkey
+```
+
+These values are generated from the user's own Hue Bridge. They are not downloaded from this GitHub repo and should not be shared publicly.
+
+### 5. Get `identification`
+
+Use the `username` from the previous step:
+
+```powershell
+curl.exe -k "https://<bridge-ip>/api/<username>/config"
+```
+
+Use:
+
+```text
+bridgeid -> Hue Bridge identification
+```
+
+### 6. Get The Entertainment Area `rid`
+
+Run:
+
+```powershell
+curl.exe -k "https://<bridge-ip>/clip/v2/resource/entertainment_configuration" `
+  -H "hue-application-key: <username>"
+```
+
+Use the selected Entertainment Area's top-level `id` as:
+
+```text
+Hue Entertainment Area rid
+```
+
+### 7. Run The Windows Launcher
+
+Double-click:
+
+```text
+bridge/run_hue_artnet_bridge.bat
+```
+
+The launcher will install or find Python, create a local `.venv`, install dependencies, create `bridge/config.json`, and ask for setup values.
+
+When prompted, enter:
+
+| Prompt | What To Enter |
+| --- | --- |
+| Hue Bridge IP address | Current Hue Bridge IP, for example `192.168.1.112` |
+| Hue API username | `username` from step 4 |
+| Hue Entertainment clientkey | `clientkey` from step 4 |
+| Hue Entertainment Area rid | Entertainment Area `id` from step 6 |
+| Hue Bridge identification | `bridgeid` from step 5 |
+| Art-Net listen host | `0.0.0.0` |
+| Art-Net listen port | `6454` |
+| Art-Net universe | `1` |
+| Hue fixture/light count | Number of Hue lights in the Entertainment Area |
+| DMX channels per fixture | `4` |
+
+### 8. Set Unreal Engine Art-Net Output
+
+If Unreal Engine and the Python bridge are running on the same computer:
+
+```text
+Destination IP: 127.0.0.1
+Port: 6454
+Universe: 1
+Fixture layout: Dimmer, Red, Green, Blue
+```
+
+If Unreal Engine is on a different computer, set the destination IP to the computer running `run_hue_artnet_bridge.bat`.
+
+### Troubleshooting Start-Up
+
+If the launcher times out while connecting to the Hue Bridge, the Hue Bridge IP is probably wrong or the computer cannot reach the bridge on the local network.
+
+Check:
+
+```powershell
+ping <bridge-ip>
+Test-NetConnection <bridge-ip> -Port 443
+```
+
+## Manual Run
+
+The Windows launcher is recommended for most users. Use this manual path only if you already have Python installed and want to run the bridge from a terminal.
 
 1. Configure a Hue Entertainment Area in the Philips Hue app.
 2. Copy `bridge/config.example.json` to `bridge/config.json`.
@@ -89,12 +189,8 @@ Set the Hue Bridge's local network IP in `bridge/config.json` as `hue.ip_address
 
 | Document | Purpose |
 | --- | --- |
-| [Overview](docs/overview.md) | Project concept and component responsibilities |
-| [Communication Workflow](docs/communication-workflow.md) | Protocol flow from Unreal Engine to Hue lights |
-| [Hardware Workflow](docs/hardware-workflow.md) | Physical laptop, router, bridge, and light setup |
-| [System Architecture](docs/system-architecture.md) | What each component does and does not do |
-| [Unreal Setup](docs/unreal-setup.md) | Unreal Engine DMX / Art-Net setup notes |
 | [Hue Bridge Setup](docs/hue-bridge-setup.md) | Hue Entertainment setup notes |
+| [Unreal Setup](docs/unreal-setup.md) | Unreal Engine DMX / Art-Net setup notes |
 | [DMX Mapping](docs/dmx-mapping.md) | DMX channel mapping |
 | [Troubleshooting](docs/troubleshooting.md) | Common setup issues |
 
@@ -102,9 +198,7 @@ Set the Hue Bridge's local network IP in `bridge/config.json` as `hue.ip_address
 
 ```text
 bridge/             Python Art-Net to Hue bridge
-docs/               Architecture, workflow, and setup documentation
-docs/images/        Generated workflow diagrams
-unreal-template/    Unreal Engine template distribution notes
+docs/               Setup and troubleshooting notes
 ```
 
 ## Security
