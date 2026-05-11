@@ -11,8 +11,9 @@ import sys
 from pathlib import Path
 
 
-CONFIG_PATH = Path("config.json")
-EXAMPLE_PATH = Path("config.example.json")
+BASE_DIR = Path(__file__).resolve().parent
+CONFIG_PATH = BASE_DIR / "config.json"
+EXAMPLE_PATH = BASE_DIR / "config.example.json"
 REQUIRED_HUE_FIELDS = (
     "ip_address",
     "username",
@@ -45,6 +46,15 @@ def prompt_value(label, current):
     return value or current
 
 
+def prompt_int(label, current):
+    while True:
+        value = prompt_value(label, str(current))
+        try:
+            return int(value)
+        except ValueError:
+            print(f"Please enter a whole number for {label}.")
+
+
 def load_config():
     if CONFIG_PATH.exists():
         with CONFIG_PATH.open("r", encoding="utf-8") as file:
@@ -60,6 +70,11 @@ def load_config():
 def needs_setup(config):
     hue = config.get("hue", {})
     return any(is_placeholder(hue.get(field, "")) for field in REQUIRED_HUE_FIELDS)
+
+
+def missing_hue_fields(config):
+    hue = config.get("hue", {})
+    return [field for field in REQUIRED_HUE_FIELDS if is_placeholder(hue.get(field, ""))]
 
 
 def main():
@@ -96,18 +111,15 @@ def main():
     )
 
     artnet["host"] = prompt_value("Art-Net listen host", artnet.get("host", "0.0.0.0"))
-    artnet["port"] = int(prompt_value("Art-Net listen port", str(artnet.get("port", 6454))))
-    artnet["universe"] = int(
-        prompt_value("Art-Net universe", str(artnet.get("universe", 1)))
+    artnet["port"] = prompt_int("Art-Net listen port", artnet.get("port", 6454))
+    artnet["universe"] = prompt_int("Art-Net universe", artnet.get("universe", 1))
+    artnet["fixture_count"] = prompt_int(
+        "Hue fixture/light count",
+        artnet.get("fixture_count", 11),
     )
-    artnet["fixture_count"] = int(
-        prompt_value("Hue fixture/light count", str(artnet.get("fixture_count", 11)))
-    )
-    artnet["channels_per_fixture"] = int(
-        prompt_value(
-            "DMX channels per fixture",
-            str(artnet.get("channels_per_fixture", 4)),
-        )
+    artnet["channels_per_fixture"] = prompt_int(
+        "DMX channels per fixture",
+        artnet.get("channels_per_fixture", 4),
     )
 
     with CONFIG_PATH.open("w", encoding="utf-8") as file:
@@ -116,6 +128,18 @@ def main():
 
     print("")
     print("Saved bridge\\config.json.")
+
+    missing = missing_hue_fields(config)
+    if missing:
+        print("")
+        print("Config is still missing required Hue values:")
+        for field in missing:
+            print(f"- hue.{field}")
+        print("")
+        print("Open bridge\\config.json or run this launcher again after you have them.")
+        return 1
+
+    return 0
 
 
 if __name__ == "__main__":

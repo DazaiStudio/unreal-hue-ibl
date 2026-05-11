@@ -45,7 +45,7 @@ On Windows, open the `bridge/` folder and double-click:
 run_hue_artnet_bridge.bat
 ```
 
-The launcher will look for Python 3 first. If Python is not installed, it will try to install Python automatically with Windows Package Manager (`winget`). Then it creates a local Python virtual environment, installs Python dependencies, creates `bridge/config.json` when needed, and prompts for Hue Bridge settings the first time it runs.
+The launcher uses PowerShell to bootstrap the bridge. It looks for a real Python 3 install first and ignores the Windows Store `python.exe` placeholder. If Python is not installed, it tries to install Python automatically with Windows Package Manager (`winget`), then falls back to downloading the official Windows installer from python.org. Then it creates a local Python virtual environment, installs Python dependencies, creates `bridge/config.json` when needed, and prompts for Hue Bridge settings the first time it runs.
 
 If the computer does not have `winget` or internet access, install Python 3 manually from <https://www.python.org/downloads/> and enable `Add python.exe to PATH` during installation.
 
