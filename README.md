@@ -53,6 +53,8 @@ You still need your Hue Bridge values: `ip_address`, `username`, `clientkey`, an
 
 The Hue Bridge IP can change when you move to another router, restart network gear, or get a new DHCP lease. `192.168.1.100` is only an example. If the bridge cannot connect, find the current Hue Bridge IP again and update `bridge/config.json`.
 
+Hue API values are not requested from a public website or shared between users. Each user generates their own `username` and `clientkey` from their local Hue Bridge by pressing the physical bridge button and calling the local Hue API. The Entertainment Area `rid` also comes from that user's own Hue Bridge setup.
+
 ### Manual Run
 
 1. Configure a Hue Entertainment Area in the Philips Hue app.
