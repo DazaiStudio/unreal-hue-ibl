@@ -37,6 +37,20 @@ This repository is intentionally not a full Unreal Engine project backup. Large 
 
 ## Run The Bridge
 
+### One-Click Windows Launcher
+
+On Windows, open the `bridge/` folder and double-click:
+
+```text
+run_hue_artnet_bridge.bat
+```
+
+The launcher will create a local Python virtual environment, install Python dependencies, create `bridge/config.json` when needed, and prompt for Hue Bridge settings the first time it runs.
+
+You still need your Hue Bridge values: `ip_address`, `username`, `clientkey`, and Entertainment Area `rid`. See [Hue Bridge Setup](docs/hue-bridge-setup.md) for how to find or generate them.
+
+### Manual Run
+
 1. Configure a Hue Entertainment Area in the Philips Hue app.
 2. Copy `bridge/config.example.json` to `bridge/config.json`.
 3. Fill in your Hue Bridge values in `bridge/config.json`. See [Hue Bridge Setup](docs/hue-bridge-setup.md) for how to generate `username`, `clientkey`, and `rid`.
