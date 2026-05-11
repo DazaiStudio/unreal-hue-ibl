@@ -25,6 +25,7 @@ import socket
 import struct
 from pathlib import Path
 
+import requests
 import urllib3
 from hue_entertainment_pykit import Entertainment, Streaming, create_bridge
 
@@ -122,6 +123,26 @@ def create_streaming_session(hue_config):
     return streaming
 
 
+def print_hue_connection_help(hue_config, exc):
+    """Print a short, actionable message when the Hue Bridge cannot be reached."""
+    ip_address = hue_config.get("ip_address", "<missing>")
+
+    print("")
+    print(f"Could not connect to the Hue Bridge at {ip_address}.")
+    print("")
+    print("Check these items:")
+    print("- The Hue Bridge is powered on and connected to the same router/LAN.")
+    print("- bridge/config.json has the current Hue Bridge IP, not the computer IP.")
+    print("- The computer is on the same network as the Hue Bridge, not guest Wi-Fi.")
+    print("- VPN, campus network isolation, or router client isolation is not blocking LAN access.")
+    print("")
+    print("Quick checks from PowerShell on this computer:")
+    print(f"- Test-NetConnection {ip_address} -Port 443")
+    print("- Invoke-RestMethod https://discovery.meethue.com/")
+    print("")
+    print(f"Original error: {exc}")
+
+
 async def artnet_listener(streaming, artnet_config):
     """
     Listen for Art-Net packets and forward changed fixture colors to Hue.
@@ -188,7 +209,11 @@ async def main():
     args = parser.parse_args()
 
     config = load_config(args.config)
-    streaming = create_streaming_session(config["hue"])
+    try:
+        streaming = create_streaming_session(config["hue"])
+    except requests.exceptions.RequestException as exc:
+        print_hue_connection_help(config.get("hue", {}), exc)
+        raise SystemExit(1) from exc
 
     print("Connecting to Hue Entertainment Stream")
     streaming.start_stream()
